@@ -1,4 +1,4 @@
-/* grainc-flags --no-gc */
+/* grainc-flags --no-gc --no-pervasives */
 
 export foreign wasm storage_read: (WasmI64, WasmI64, WasmI64) -> WasmI64 as storageRead from "env"
 export foreign wasm storage_write: (WasmI64, WasmI64, WasmI64, WasmI64, WasmI64) -> WasmI64 as storageWrite from "env"

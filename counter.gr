@@ -1,11 +1,11 @@
-/* grainc-flags --no-gc */
+/* grainc-flags --no-gc --no-pervasives */
 
 import WasmI32, {
   add as (+)
 } from "runtime/unsafe/wasmi32"
 import WasmI64 from "runtime/unsafe/wasmi64"
 import Memory from "runtime/unsafe/memory"
-import Conv from "runtime/unsafe/conv"
+// import Conv from "runtime/unsafe/conv"
 
 import Env from "./nearEnv"
 
@@ -19,7 +19,7 @@ let _REG = 0N
 
 export let setCounter = (val) => {
   // Write the value to memory.
-  WasmI32.store(_VAL_PTR, Conv.fromInt32(val), 0n)
+  WasmI32.store(_VAL_PTR, val, 0n)
 
   // Tell the host where the key and value are located and their lengths.
   // If there is an old value it is written to _REG.
@@ -39,7 +39,7 @@ export let loadCounter = () => {
 
   if (WasmI64.eqz(Env.storageHasKey(_KEY_LEN, _KEY_PTR))) {
     // Initialize to zero.
-    setCounter(0l)
+    setCounter(0n)
   }
 
   // Read the value into _REG
@@ -49,5 +49,5 @@ export let loadCounter = () => {
   // However, we already know the length of the value.
   Env.readRegister(_REG, WasmI64.extendI32S(_VAL_PTR))
   // Load the value from memory
-  Conv.toInt32(WasmI32.load(_VAL_PTR, 0n))
+  WasmI32.load(_VAL_PTR, 0n)
 }
