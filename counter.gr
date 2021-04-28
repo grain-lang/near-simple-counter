@@ -1,32 +1,28 @@
 /* grainc-flags --no-gc --no-pervasives */
 
-import WasmI32, {
-  add as (+)
-} from "runtime/unsafe/wasmi32"
+import WasmI32 from "runtime/unsafe/wasmi32"
 import WasmI64 from "runtime/unsafe/wasmi64"
 import Memory from "runtime/unsafe/memory"
+import { itoa64 } from "runtime/numberUtils"
+
 // import Conv from "runtime/unsafe/conv"
 
 import Env from "./nearEnv"
 
-export let _KEY_PTR = Memory.malloc(16n)
-export let _KEY_LEN = 8n
+export let _KEY_PTR = 100N
+export let _KEY_LEN = 8N
 
-export let _VAL_PTR = _KEY_PTR + _KEY_LEN
-export let _VAL_LEN = 4n
+export let _VAL_PTR = 108N
+export let _VAL_LEN = 8N
 
 let _REG = 0N
 
 export let setCounter = (val) => {
   // Write the value to memory.
-  WasmI32.store(_VAL_PTR, val, 0n)
+  WasmI64.store(WasmI32.wrapI64(_VAL_PTR), val, 0n)
 
   // Tell the host where the key and value are located and their lengths.
   // If there is an old value it is written to _REG.
-  let _KEY_LEN = WasmI64.extendI32S(_KEY_LEN)
-  let _KEY_PTR = WasmI64.extendI32S(_KEY_PTR)
-  let _VAL_LEN = WasmI64.extendI32S(_VAL_LEN)
-  let _VAL_PTR = WasmI64.extendI32S(_VAL_PTR)
 
   Env.storageWrite(_KEY_LEN, _KEY_PTR, _VAL_LEN, _VAL_PTR, _REG)
   void
@@ -34,20 +30,27 @@ export let setCounter = (val) => {
 
 export let loadCounter = () => {
   // Check if key is in storage
-  let _KEY_LEN = WasmI64.extendI32S(_KEY_LEN)
-  let _KEY_PTR = WasmI64.extendI32S(_KEY_PTR)
-
   if (WasmI64.eqz(Env.storageHasKey(_KEY_LEN, _KEY_PTR))) {
     // Initialize to zero.
-    setCounter(0n)
+    0N
+  } else {
+    // Read the value into _REG
+    Env.storageRead(_KEY_LEN, _KEY_PTR, _REG)
+    // Next write the value to memory.
+    // Normally wed want to use `Env.registerLen` to allocate the correct amount of space.
+    // However, we already know the length of the value.
+    Env.readRegister(_REG, _VAL_PTR)
+    // Load the value from memory
+    WasmI64.load(WasmI32.wrapI64(_VAL_PTR), 0n)
   }
+}
 
-  // Read the value into _REG
-  Env.storageRead(_KEY_LEN, _KEY_PTR, _REG)
-  // Next write the value to memory.
-  // Normally we'd want to use `Env.registerLen` to allocate the correct amount of space.
-  // However, we already know the length of the value.
-  Env.readRegister(_REG, WasmI64.extendI32S(_VAL_PTR))
-  // Load the value from memory
-  WasmI32.load(_VAL_PTR, 0n)
+export let counterAsStr = () => {
+  let counter = loadCounter()
+    itoa64(counter, 10n)
+}
+
+export let printCounter = () => {
+    let str = counterAsStr()
+    Env.log(str)
 }

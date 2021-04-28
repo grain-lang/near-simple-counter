@@ -1,25 +1,40 @@
 /* grainc-flags --no-gc --no-pervasives */
-
-import WasmI32, {
+import  {
   add as (+),
   sub as (-)
-} from "runtime/unsafe/wasmi32"
+} from "runtime/unsafe/wasmi64"
 import WasmI64 from "runtime/unsafe/wasmi64"
+import WasmI32 from "runtime/unsafe/wasmi32"
+
 
 import Env from "./nearEnv"
-import { setCounter, loadCounter, _VAL_LEN, _VAL_PTR } from "./counter"
+import { 
+  setCounter, 
+  loadCounter,
+  _VAL_PTR,
+  _VAL_LEN,
+  printCounter
+  } from "./counter"
 
 export let increment = () => {
-  setCounter(loadCounter() + 1n)
+  setCounter(loadCounter() + 1N)
+  printCounter()
 }
 
 export let decrement = () => {
-  setCounter(loadCounter() - 1n)
+  setCounter(loadCounter() - 1N)
+  printCounter()
 }
 
 export let getCounter = () => {
   // Write the value of the counter to memory
   loadCounter()
+  //let value = WasmI64.load(WasmI32.wrapI64(Env._VAL_PTR)
   // Tell host the location and length of the value
-  Env.valueReturn(WasmI64.extendI32S(_VAL_LEN), WasmI64.extendI32S(_VAL_PTR))
+  //Env.valueReturn(8N, 108N)
+  printCounter()
+}
+
+export let helloWorld = () => {
+ Env.log("hello world")
 }

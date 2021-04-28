@@ -1,5 +1,8 @@
 /* grainc-flags --no-gc --no-pervasives */
 
+import WasmI64 from "runtime/unsafe/wasmi64"
+import WasmI32 from "runtime/unsafe/wasmi32"
+
 export foreign wasm storage_read: (WasmI64, WasmI64, WasmI64) -> WasmI64 as storageRead from "env"
 export foreign wasm storage_write: (WasmI64, WasmI64, WasmI64, WasmI64, WasmI64) -> WasmI64 as storageWrite from "env"
 export foreign wasm storage_has_key: (WasmI64, WasmI64) -> WasmI64 as storageHasKey from "env"
@@ -7,3 +10,13 @@ export foreign wasm storage_has_key: (WasmI64, WasmI64) -> WasmI64 as storageHas
 export foreign wasm read_register: (WasmI64, WasmI64) -> Void as readRegister from "env"
 
 export foreign wasm value_return: (WasmI64, WasmI64) -> Void as valueReturn from "env"
+export foreign wasm log_utf8: (WasmI64, WasmI64) -> Void as logUTF8 from "env"
+
+
+export let log = (str) => {
+  let obj = WasmI32.fromGrain(str)
+  let len = WasmI64.extendI32S(WasmI32.load(WasmI32.add(obj, 4n), 0n))
+  let ptr = WasmI64.extendI32S(WasmI32.add(obj, 8n))
+  logUTF8(len, ptr)
+}
+
