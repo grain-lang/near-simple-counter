@@ -18,6 +18,5 @@ export let getCounter = () => {
   // Write the value of the counter to memory
   loadCounter()
   // Tell host the location and length of the value
-
   Env.valueReturn(WasmI64.extendI32S(_VAL_LEN), WasmI64.extendI32S(_VAL_PTR))
 }

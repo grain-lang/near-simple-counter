@@ -21,7 +21,6 @@ export let setCounter = val => {
 
   // Tell the host where the key and value are located and their lengths.
   // If there is an old value it is written to _REG.
-
   let _KEY_LEN = WasmI64.extendI32S(_KEY_LEN)
   let _KEY_PTR = WasmI64.extendI32S(_KEY_PTR)
   let _VAL_LEN = WasmI64.extendI32S(_VAL_LEN)
@@ -42,14 +41,11 @@ export let loadCounter = () => {
   }
 
   // Read the value into _REG
-
   Env.storageRead(_KEY_LEN, _KEY_PTR, _REG)
   // Next write the value to memory.
   // Normally we'd want to use `Env.registerLen` to allocate the correct amount of space.
   // However, we already know the length of the value.
-
   Env.readRegister(_REG, WasmI64.extendI32S(_VAL_PTR))
   // Load the value from memory
-
   Conv.toInt32(WasmI32.load(_VAL_PTR, 0n))
 }
