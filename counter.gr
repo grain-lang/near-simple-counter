@@ -13,7 +13,7 @@ export let _KEY_LEN = 8n
 export let _VAL_PTR = _KEY_PTR + _KEY_LEN
 export let _VAL_LEN = 4n
 
-let _REG = 0N
+export let _REG = 0N
 
 export let setCounter = val => {
   // Write the value to memory.

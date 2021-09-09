@@ -4,7 +4,7 @@ import Int32, { add as (+), sub as (-) } from "int32"
 import WasmI64 from "runtime/unsafe/wasmi64"
 
 import Env from "./nearEnv"
-import { setCounter, loadCounter, _VAL_LEN, _VAL_PTR } from "./counter"
+import { _REG, setCounter, loadCounter, _VAL_LEN, _VAL_PTR } from "./counter"
 
 export let increment = () => {
   setCounter((loadCounter()) + 1l)
@@ -18,5 +18,5 @@ export let getCounter = () => {
   // Write the value of the counter to memory
   loadCounter()
   // Tell host the location and length of the value
-  Env.valueReturn(WasmI64.extendI32S(_VAL_LEN), WasmI64.extendI32S(_VAL_PTR))
+  Env.valueReturn(9223372036854775807N, _REG)
 }

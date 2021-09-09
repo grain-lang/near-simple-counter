@@ -1,27 +1,27 @@
 const path = require('path');
 const { Runner } = require('near-runner');
 
+const runner = Runner.create(async ({ root }) => ({
+    contract:  await root.createAndDeploy(
+      'grain-near-simple-counter',
+      path.join(__dirname, '..', 'index.gr.wasm'))
+    }));
+
 describe('counter contract', () => {
-  let runner;
   jest.setTimeout(60_000);
 
-  beforeAll(async () => {
-    runner = await Runner.create(async ({ root }) => {
-      const grainbot = await root.createAccount('grainbot');
-      const contract = await root.createAndDeploy(
-        'grain-near-simple-counter',
-        path.join(__dirname, '..', 'index.gr.wasm'),
-      );
+  test.concurrent('increments & decrements', async () => {
+    await runner.run(async ({ root, contract }) => {
+      await root.call(contract, 'increment', {});
+      await root.call(contract, 'increment', {});
+      await root.call(contract, 'decrement', {});
+      await root.call(contract, 'increment', {});
 
-      return { grainbot, contract };
-    });
-  });
+      await root.call(contract, 'increment', {});
 
-  test('increments & decrements', async () => {
-    await runner.run(async ({ grainbot, contract }) => {
-      await grainbot.call(contract, 'increment', {});
-      await grainbot.call(contract, 'increment', {});
-      await grainbot.call(contract, 'decrement', {});
+      await root.call(contract, 'increment', {});
+
+      console.log(await contract.view('getCounter'))
       /* Should print:
          ContractState {
            data: Map(1) { '\x00\x00\x00\x00\x00\x00\x00\x00' => <Buffer 01 00 00 00> }
@@ -30,4 +30,5 @@ describe('counter contract', () => {
       console.log(await contract.viewState());
     });
   });
+
 });
