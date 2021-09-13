@@ -1,0 +1,12 @@
+/* grainc-flags --no-gc */
+
+import WasmI32 from "runtime/unsafe/wasmi32"
+import WasmI64 from "runtime/unsafe/wasmi64"
+import Env from "./core/env"
+
+export let valueReturn = (value: String) => {
+  let value = WasmI32.fromGrain(value)
+  let len = WasmI64.load32U(value, 4n)
+  let ptr = WasmI64.extendI32U(WasmI32.add(value, 8n))
+  Env.valueReturn(len, ptr)
+}

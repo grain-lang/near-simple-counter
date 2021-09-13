@@ -1,11 +1,6 @@
-/* grainc-flags --no-gc */
-
-import Int32, { add as (+), sub as (-) } from "int32"
-import WasmI32 from "runtime/unsafe/wasmi32"
-import WasmI64 from "runtime/unsafe/wasmi64"
-
-import Env from "./nearEnv"
-import { _REG, setCounter, loadCounter, _VAL_LEN, _VAL_PTR } from "./counter"
+import { add as (+), sub as (-) } from "int32"
+import Contract from "./near-sdk-gr/contract"
+import { setCounter, loadCounter } from "./counter"
 
 export let increment = () => {
   setCounter((loadCounter()) + 1l)
@@ -17,7 +12,5 @@ export let decrement = () => {
 
 export let getCounter = () => {
   let value = toString(loadCounter())
-  let length = WasmI32.load(WasmI32.fromGrain(value), 4n)
-  let ptr = WasmI32.load(WasmI32.fromGrain(value), 8n)
-  Env.valueReturn(WasmI64.extendI32S(length), WasmI64.extendI32S(ptr))
+  Contract.valueReturn(value)
 }

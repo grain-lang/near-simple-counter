@@ -1,0 +1,103 @@
+/* grainc-flags --no-gc */
+
+import WasmI32 from "runtime/unsafe/wasmi32"
+import WasmI64 from "runtime/unsafe/wasmi64"
+import Env from "./core/env"
+import Util from "./core/util"
+
+export let hasKey = (key: String) => {
+  let key = WasmI32.fromGrain(key)
+  let keyLen = WasmI64.load32U(key, 4n)
+  let keyPtr = WasmI64.extendI32U(WasmI32.add(key, 8n))
+  WasmI64.eq(Env.storageHasKey(keyLen, keyPtr), 1N)
+}
+
+export let getString = (key: String) => {
+  let key = WasmI32.fromGrain(key)
+  let keyLen = WasmI64.load32U(key, 4n)
+  let keyPtr = WasmI64.extendI32U(WasmI32.add(key, 8n))
+  let res = Env.storageRead(keyLen, keyPtr, 0N)
+  if (WasmI64.eqz(res)) {
+    None
+  } else {
+    Some(Util.readRegisterString(0N))
+  }
+}
+
+export let getBytes = (key: String) => {
+  let key = WasmI32.fromGrain(key)
+  let keyLen = WasmI64.load32U(key, 4n)
+  let keyPtr = WasmI64.extendI32U(WasmI32.add(key, 8n))
+  let res = Env.storageRead(keyLen, keyPtr, 0N)
+  if (WasmI64.eqz(res)) {
+    None
+  } else {
+    Some(Util.readRegisterBytes(0N))
+  }
+}
+
+export let getInt32 = (key: String) => {
+  let key = WasmI32.fromGrain(key)
+  let keyLen = WasmI64.load32U(key, 4n)
+  let keyPtr = WasmI64.extendI32U(WasmI32.add(key, 8n))
+  let res = Env.storageRead(keyLen, keyPtr, 0N)
+  if (WasmI64.eqz(res)) {
+    None
+  } else {
+    Some(Util.readRegisterInt32(0N))
+  }
+}
+
+export let getInt64 = (key: String) => {
+  let key = WasmI32.fromGrain(key)
+  let keyLen = WasmI64.load32U(key, 4n)
+  let keyPtr = WasmI64.extendI32U(WasmI32.add(key, 8n))
+  let res = Env.storageRead(keyLen, keyPtr, 0N)
+  if (WasmI64.eqz(res)) {
+    None
+  } else {
+    Some(Util.readRegisterInt64(0N))
+  }
+}
+
+let setStringLike = (key, value) => {
+  let keyLen = WasmI64.load32U(key, 4n)
+  let valueLen = WasmI64.load32U(value, 4n)
+  let keyPtr = WasmI64.extendI32U(WasmI32.add(key, 8n))
+  let valuePtr = WasmI64.extendI32U(WasmI32.add(value, 8n))
+  Env.storageWrite(keyLen, keyPtr, valueLen, valuePtr, 0N)
+  void
+}
+
+export let setString = (key: String, value: String) => {
+  let key = WasmI32.fromGrain(key)
+  let value = WasmI32.fromGrain(value)
+  setStringLike(key, value)
+}
+
+export let setBytes = (key: Bytes, value: Bytes) => {
+  let key = WasmI32.fromGrain(key)
+  let value = WasmI32.fromGrain(value)
+  setStringLike(key, value)
+}
+
+let setFixnum = (key, value, width) => {
+  let keyLen = WasmI64.load32U(key, 4n)
+  let valueLen = width
+  let keyPtr = WasmI64.extendI32U(WasmI32.add(key, 8n))
+  let valuePtr = WasmI64.extendI32U(WasmI32.add(value, 8n))
+  Env.storageWrite(keyLen, keyPtr, valueLen, valuePtr, 0N)
+  void
+}
+
+export let setInt32 = (key: String, value: Int32) => {
+  let key = WasmI32.fromGrain(key)
+  let value = WasmI32.fromGrain(value)
+  setFixnum(key, value, 4N)
+}
+
+export let setInt64 = (key: String, value: Int64) => {
+  let key = WasmI32.fromGrain(key)
+  let value = WasmI32.fromGrain(value)
+  setFixnum(key, value, 8N)
+}

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "build": "grain compile --no-gc --wasi-polyfill wasi.gr --use-start-section --no-bulk-memory index.gr",
+    "build": "grain compile --no-gc --wasi-polyfill near-sdk-gr/wasi.gr --use-start-section --no-bulk-memory index.gr",
     "pretest": "npm run build",
     "test": "jest --verbose"
   },

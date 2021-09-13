@@ -1,0 +1,37 @@
+/* grainc-flags --no-gc */
+
+import WasmI32 from "runtime/unsafe/wasmi32"
+import WasmI64 from "runtime/unsafe/wasmi64"
+import {
+  allocateString,
+  allocateBytes,
+  allocateInt32,
+  allocateInt64
+} from "runtime/dataStructures"
+import Env from "./env"
+
+export let readRegisterString = id => {
+  let valueLen = Env.registerLen(id)
+  let value = allocateString(WasmI32.wrapI64(valueLen))
+  Env.readRegister(id, WasmI64.extendI32U(WasmI32.add(value, 8n)))
+  WasmI32.toGrain(value): (String)
+}
+
+export let readRegisterBytes = id => {
+  let valueLen = Env.registerLen(id)
+  let value = allocateBytes(WasmI32.wrapI64(valueLen))
+  Env.readRegister(id, WasmI64.extendI32U(WasmI32.add(value, 8n)))
+  WasmI32.toGrain(value): (Bytes)
+}
+
+export let readRegisterInt32 = id => {
+  let value = allocateInt32()
+  Env.readRegister(id, WasmI64.extendI32U(WasmI32.add(value, 8n)))
+  WasmI32.toGrain(value): (Int32)
+}
+
+export let readRegisterInt64 = id => {
+  let value = allocateInt64()
+  Env.readRegister(id, WasmI64.extendI32U(WasmI32.add(value, 8n)))
+  WasmI32.toGrain(value): (Int64)
+}

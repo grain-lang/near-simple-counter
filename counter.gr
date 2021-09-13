@@ -1,50 +1,19 @@
-/* grainc-flags --no-gc */
-
-import WasmI32, { add as (+) } from "runtime/unsafe/wasmi32"
-import WasmI64 from "runtime/unsafe/wasmi64"
-import Memory from "runtime/unsafe/memory"
-import Conv from "runtime/unsafe/conv"
-
-import Env from "./nearEnv"
+import Option from "option"
+import Storage from "./near-sdk-gr/storage"
 
 let key = "counter"
 
-export let _VAL_PTR = Memory.malloc(4n)
-export let _VAL_LEN = 4n
-
-export let _REG = 0N
-
 export let setCounter = val => {
   // Write the value to memory.
-  WasmI32.store(_VAL_PTR, Conv.fromInt32(val), 0n)
-
-  // Tell the host where the key and value are located and their lengths.
-  // If there is an old value it is written to _REG.
-  let _KEY_LEN = WasmI64.extendI32S(WasmI32.load(WasmI32.fromGrain(key), 4n))
-  let _KEY_PTR = WasmI64.extendI32S(WasmI32.add(WasmI32.fromGrain(key), 8n))
-  let _VAL_LEN = WasmI64.extendI32S(_VAL_LEN)
-  let _VAL_PTR = WasmI64.extendI32S(_VAL_PTR)
-
-  Env.storageWrite(_KEY_LEN, _KEY_PTR, _VAL_LEN, _VAL_PTR, _REG)
-  void
+  Storage.setInt32(key, val)
 }
 
 export let loadCounter = () => {
   // Check if key is in storage
-  let _KEY_LEN = WasmI64.extendI32S(WasmI32.load(WasmI32.fromGrain(key), 4n))
-  let _KEY_PTR = WasmI64.extendI32S(WasmI32.add(WasmI32.fromGrain(key), 8n))
-
-  if (WasmI64.eqz(Env.storageHasKey(_KEY_LEN, _KEY_PTR))) {
+  if (!(Storage.hasKey(key))) {
     // Initialize to zero.
     setCounter(0l)
   }
 
-  // Read the value into _REG
-  Env.storageRead(_KEY_LEN, _KEY_PTR, _REG)
-  // Next write the value to memory.
-  // Normally we'd want to use `Env.registerLen` to allocate the correct amount of space.
-  // However, we already know the length of the value.
-  Env.readRegister(_REG, WasmI64.extendI32S(_VAL_PTR))
-  // Load the value from memory
-  Conv.toInt32(WasmI32.load(_VAL_PTR, 0n))
+  Option.expect("key should be set", Storage.getInt32(key))
 }
