@@ -22,13 +22,7 @@ describe("counter contract", () => {
 
       await root.call(contract, "increment", {});
 
-      console.log(await contract.view("getCounter"));
-      /* Should print:
-         ContractState {
-           data: Map(1) { 'counter' => <Buffer 04 00 00 00> }
-         }
-      */
-      console.log(await contract.viewState());
+      expect(await contract.view("getCounter")).toEqual("4");
     });
   });
 });
