@@ -1,4 +1,4 @@
-export let fd_write: ( WasmI32, WasmI32, WasmI32, WasmI32 ) -> WasmI32 =
+export let fd_write: (WasmI32, WasmI32, WasmI32, WasmI32) -> WasmI32 =
   (
     fd,
     iovs,
