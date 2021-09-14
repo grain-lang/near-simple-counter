@@ -1,4 +1,4 @@
-/* grainc-flags --no-gc */
+/* grainc-flags --no-gc --no-bulk-memory */
 
 import Int32, { add as (+), sub as (-) } from "int32"
 import WasmI32 from "runtime/unsafe/wasmi32"
