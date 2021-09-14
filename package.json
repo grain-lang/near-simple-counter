@@ -1,0 +1,14 @@
+{
+  "name": "near-simple-counter",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "build": "grain compile --wasi-polyfill wasi.gr --use-start-section index.gr",
+    "pretest": "npm run build",
+    "test": "jest --verbose"
+  },
+  "devDependencies": {
+    "jest": "^27.1.0",
+    "near-runner": "^0.6.0"
+  }
+}

@@ -1,30 +1,27 @@
-/* grainc-flags --no-gc */
+/* grainc-flags --no-gc --no-bulk-memory */
 
-import WasmI32, {
-  add as (+)
-} from "runtime/unsafe/wasmi32"
+import WasmI32, { add as (+) } from "runtime/unsafe/wasmi32"
 import WasmI64 from "runtime/unsafe/wasmi64"
 import Memory from "runtime/unsafe/memory"
 import Conv from "runtime/unsafe/conv"
 
 import Env from "./nearEnv"
 
-export let _KEY_PTR = Memory.malloc(16n)
-export let _KEY_LEN = 8n
+let key = "counter"
 
-export let _VAL_PTR = _KEY_PTR + _KEY_LEN
+export let _VAL_PTR = Memory.malloc(4n)
 export let _VAL_LEN = 4n
 
-let _REG = 0N
+export let _REG = 0N
 
-export let setCounter = (val) => {
+export let setCounter = val => {
   // Write the value to memory.
   WasmI32.store(_VAL_PTR, Conv.fromInt32(val), 0n)
 
   // Tell the host where the key and value are located and their lengths.
   // If there is an old value it is written to _REG.
-  let _KEY_LEN = WasmI64.extendI32S(_KEY_LEN)
-  let _KEY_PTR = WasmI64.extendI32S(_KEY_PTR)
+  let _KEY_LEN = WasmI64.extendI32S(WasmI32.load(WasmI32.fromGrain(key), 4n))
+  let _KEY_PTR = WasmI64.extendI32S(WasmI32.add(WasmI32.fromGrain(key), 8n))
   let _VAL_LEN = WasmI64.extendI32S(_VAL_LEN)
   let _VAL_PTR = WasmI64.extendI32S(_VAL_PTR)
 
@@ -34,8 +31,8 @@ export let setCounter = (val) => {
 
 export let loadCounter = () => {
   // Check if key is in storage
-  let _KEY_LEN = WasmI64.extendI32S(_KEY_LEN)
-  let _KEY_PTR = WasmI64.extendI32S(_KEY_PTR)
+  let _KEY_LEN = WasmI64.extendI32S(WasmI32.load(WasmI32.fromGrain(key), 4n))
+  let _KEY_PTR = WasmI64.extendI32S(WasmI32.add(WasmI32.fromGrain(key), 8n))
 
   if (WasmI64.eqz(Env.storageHasKey(_KEY_LEN, _KEY_PTR))) {
     // Initialize to zero.
