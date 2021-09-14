@@ -22,7 +22,7 @@ describe("counter contract", () => {
 
       await root.call(contract, "increment", {});
 
-      expect(await contract.view("getCounter")).toEqual("4");
+      expect(await contract.view("getCounter")).toEqual(4);
     });
   });
 });
