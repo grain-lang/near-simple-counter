@@ -5,7 +5,7 @@ import WasmI32 from "runtime/unsafe/wasmi32"
 import WasmI64 from "runtime/unsafe/wasmi64"
 
 import Env from "./nearEnv"
-import { _REG, setCounter, loadCounter, _VAL_LEN, _VAL_PTR } from "./counter"
+import { setCounter, loadCounter } from "./counter"
 
 export let increment = () => {
   setCounter((loadCounter()) + 1l)
@@ -17,7 +17,7 @@ export let decrement = () => {
 
 export let getCounter = () => {
   let value = toString(loadCounter())
-  let length = WasmI32.load(WasmI32.fromGrain(value), 4n)
-  let ptr = WasmI32.load(WasmI32.fromGrain(value), 8n)
-  Env.valueReturn(WasmI64.extendI32S(length), WasmI64.extendI32S(ptr))
+  let length = WasmI64.load32U(WasmI32.fromGrain(value), 4n)
+  let ptr = WasmI64.extendI32U(WasmI32.add(WasmI32.fromGrain(value), 8n))
+  Env.valueReturn(length, ptr)
 }
